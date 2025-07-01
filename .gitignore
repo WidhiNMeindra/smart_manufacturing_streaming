@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+env/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Docker
+.dockerignore
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and Data
+*.log
+*.csv
+*.zip
+data/raw_data/  # Will store the downloaded dataset
+data/processed_data/ # For any processed data files
+data/output/
+
+# Environment variables
+.env
