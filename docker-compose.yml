@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper-smart-manufacturing
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka-smart-manufacturing
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  spark-master:
+    image: bitnami/spark:3.3.0
+    container_name: spark-master-smart-manufacturing
+    command: >
+      /opt/bitnami/spark/sbin/start-master.sh -h spark-master
+    ports:
+      - "8080:8080" 
+      - "7077:7077" 
+    volumes:
+      - ./workspace:/app 
+
+  spark-worker:
+    image: bitnami/spark:3.3.0
+    container_name: spark-worker-smart-manufacturing
+    depends_on:
+      - spark-master
+    command: >
+      /opt/bitnami/spark/sbin/start-worker.sh spark://spark-master:7077
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - ./workspace:/app 
+
+  jupyter:
+    image: jupyter/pyspark-notebook:latest
+    container_name: jupyter-smart-manufacturing
+    depends_on:
+      - spark-master
+      - kafka
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./workspace:/home/jovyan/work
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - CHOWN_HOME=yes
+      - CHOWN_HOME_OPTS='-R'
+    command: start-notebook.sh --NotebookApp.token=''
+
+  postgres:
+    image: postgres:13
+    container_name: postgres_db-smart-manufacturing
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: machine_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio-smart-manufacturing
+    ports:
+      - "9000:9000" 
+      - "9011:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase-smart-manufacturing
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: machine_db
+      MB_DB_PORT: 5432
+      MB_DB_USER: user
+      MB_DB_PASS: password
+      MB_DB_HOST: postgres_db
+
+volumes:
+  postgres-data:
+  minio-data:
