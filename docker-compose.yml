@@ -50,7 +50,7 @@ services:
       - ./workspace:/app 
 
   jupyter:
-    image: jupyter/pyspark-notebook:latest
+    build: .
     container_name: jupyter-smart-manufacturing
     depends_on:
       - spark-master
@@ -103,7 +103,7 @@ services:
       MB_DB_PORT: 5432
       MB_DB_USER: user
       MB_DB_PASS: password
-      MB_DB_HOST: postgres_db
+      MB_DB_HOST: postgres_db-smart-manufacturing
 
 volumes:
   postgres-data:
