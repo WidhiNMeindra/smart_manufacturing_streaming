@@ -42,7 +42,7 @@ final-project-streaming/
 
 *Instalasi & Setup*
 1. Clone repositori ini:
-- git clone https://www.andarepository.com/
+- git clone
 - cd [nama-folder-repositori]
 2. Tempatkan Dataset: Unduh dataset yang relevan dan letakkan file CSV di dalam folder workspace/data/.
 
