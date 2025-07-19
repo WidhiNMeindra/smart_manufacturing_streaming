@@ -4,7 +4,6 @@ FROM jupyter/scipy-notebook:latest
 # Ganti ke user root untuk mendapatkan izin instalasi
 USER root
 
-# --- TAMBAHAN BARU: Instal Java Development Kit (JDK) ---
 # 1. Update daftar paket
 RUN apt-get update && \
 # 2. Instal OpenJDK versi 11 tanpa meminta konfirmasi
