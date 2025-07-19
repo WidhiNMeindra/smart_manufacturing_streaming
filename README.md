@@ -31,8 +31,7 @@ final-project-streaming/
     ├── 1_kafka_producer.ipynb
     ├── 2_spark_streaming_consumer.ipynb
     ├── 3_create_database_table.ipynb
-    ├── 4_database_writer_consumer.ipynb
-    └── 5_alerting_consumer.ipynb
+    └── 4_database_writer_consumer.ipynb
 ```
 
 ## Cara Menjalankan Proyek
